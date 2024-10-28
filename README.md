@@ -17,6 +17,9 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
 
+https://www.youtube.com/watch?v=LGY_eILc8Ks
+Using Phoenix Framework to Create an Elixir REST API Project
+
 Project setup:
 mix phx.new real_deal_api --no-install --app real_deal_api --database postgres --no-live --no-assets --no-html --no-dashboard --no-mailer --binary-id
 
@@ -42,3 +45,24 @@ Account = schema file being created.
 accounts = database table name being created.
 email:string =
 hash_password:string =
+
+mix phx.gen.json Users User users account_id:references:accounts full_name:string gender:string biography:text
+mix ecto.migrate
+
+iex(2)> RealDealApi.Accounts.create_account(%{email: "rkba1@proton.me", hash_password: "this is hashed"})
+[debug] QUERY OK source="accounts" db=21.9ms decode=1.2ms queue=0.6ms idle=1183.9ms
+INSERT INTO "accounts" ("email","hash_password","inserted_at","updated_at","id") VALUES ($1,$2,$3,$4,$5) ["rkba1@proton.me", "this is hashed", ~U[2024-10-28 00:33:58Z], ~U[2024-10-28 00:33:58Z], "43d0627b-1eec-4913-bc6e-5c3a0bfecadd"]
+↳ :elixir.eval_external_handler/3, at: src/elixir.erl:386
+{:ok,
+%RealDealApi.Accounts.Account{
+__meta__: #Ecto.Schema.Metadata<:loaded, "accounts">,
+id: "43d0627b-1eec-4913-bc6e-5c3a0bfecadd",
+email: "rkba1@proton.me",
+hash_password: "this is hashed",
+user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+inserted_at: ~U[2024-10-28 00:33:58Z],
+updated_at: ~U[2024-10-28 00:33:58Z]
+}}
+
+Database:
+real_deal_api_dev

@@ -48,6 +48,7 @@ defmodule RealDealApi.Accounts do
       iex> create_account(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
+    \\ operator allows you to specify a default value for the attrs parameter. If no argument is provided when calling create_account, attrs will default to an empty map %{}.
   """
   def create_account(attrs \\ %{}) do
     %Account{}

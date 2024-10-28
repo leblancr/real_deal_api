@@ -32,6 +32,7 @@ defmodule RealDealApi.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
