@@ -38,7 +38,7 @@ defmodule RealDealApi.Accounts do
   def get_account!(id), do: Repo.get!(Account, id)
 
   @doc """
-  Creates a account.
+  Creates an account.
 
   ## Examples
 
