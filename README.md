@@ -66,3 +66,8 @@ updated_at: ~U[2024-10-28 00:33:58Z]
 
 Database:
 real_deal_api_dev
+
+RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
+RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
+jwt:
+"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzMyODE1NjYwLCJpYXQiOjE3MzAzOTY0NjAsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiI3NWJkNjRhNy1kY2IwLTRjMmMtYTIxOC0xMjQ4NTAwMjBkZDEiLCJuYmYiOjE3MzAzOTY0NTksInN1YiI6ImQ2NzFiODA5LTBkMzYtNGI3NS04YzFlLTg1ZjE0MGVlMDA4MSIsInR5cCI6ImFjY2VzcyJ9.6hCVBtiiUtfOYnclP19yrgSKTY1fdoxZdJrmTMKflXGMcFbjVRBfZpOQHv3TdVH3wari6rG1JhvdLqcDnHLHmQ"
