@@ -9,6 +9,33 @@ defmodule RealDealApi.Accounts do
   alias RealDealApi.Accounts.Account
 
   @doc """
+  Creates an account.
+  Creating a New Struct:
+  %Account{} initializes a new instance of the Account struct. At this point, it contains no data (i.e., all fields are set to their default values).
+
+  Pipeline Usage:
+  The function then uses the pipe operator (|>) to pass this empty struct to the Account.changeset(attrs) function, where attrs is a map of attributes you want to set for this new account.
+
+  Inserting into the Database:
+  Finally, Repo.insert() attempts to insert the changeset (which includes the data from attrs and any validation) into the database.
+
+    ## Examples
+
+      iex> create_account(%{email: value, hash_password: value})
+      {:ok, %Account{}}
+
+      iex> create_account(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+    \\ operator allows you to specify a default value for the attrs parameter. If no argument is provided when calling create_account, attrs will default to an empty map %{}.
+  """
+  def create_account(attrs \\ %{}) do
+    %Account{} # new empty struct created
+    |> Account.changeset(attrs) # set values with changeset/1
+    |> Repo.insert() # insert the changeset (which includes the data from attrs and any validation) into the database
+  end
+
+  @doc """
   Returns the list of accounts.
 
   ## Examples
@@ -59,25 +86,6 @@ defmodule RealDealApi.Accounts do
   @doc """
 
   """
-
-  @doc """
-  Creates an account.
-
-  ## Examples
-
-      iex> create_account(%{email: value, hash_password: value})
-      {:ok, %Account{}}
-
-      iex> create_account(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-    \\ operator allows you to specify a default value for the attrs parameter. If no argument is provided when calling create_account, attrs will default to an empty map %{}.
-  """
-  def create_account(attrs \\ %{}) do
-    %Account{}
-    |> Account.changeset(attrs)
-    |> Repo.insert()
-  end
 
   @doc """
   Updates a account.

@@ -1,8 +1,8 @@
 defmodule RealDealApiWeb.AccountController do
   use RealDealApiWeb, :controller
 
-  alias RealDealApi.Accounts
-  alias RealDealApi.Accounts.Account
+  alias RealDealApiWeb.Auth.Guardian
+  alias RealDealApi.{Accounts, Accounts.Account, Users, Users.User}
 
   action_fallback RealDealApiWeb.FallbackController
 
@@ -11,8 +11,18 @@ defmodule RealDealApiWeb.AccountController do
     render(conn, :index, accounts: accounts)
   end
 
+  @doc """
+  {:ok, %Account{} = account} <- Accounts.create_account(account_params) means:
+  Accounts.create_account() returns a {:ok, %Account{}}, then
+  %Account{} struct that is returned is assigned to = account
+  multiple functions can be called in with, executed in order
+
+
+  """
   def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.create_account(account_params) do
+    with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(account),
+         {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/accounts/#{account}")
