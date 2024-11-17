@@ -35,6 +35,7 @@ defmodule RealDealApi.MixProject do
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
+      {:phoenix_live_view, "~> 0.18"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:telemetry_metrics, "~> 1.0"},
@@ -43,6 +44,7 @@ defmodule RealDealApi.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:plug_cowboy, "~> 2.5"},
       {:guardian, "~> 2.3"},
       {:bcrypt_elixir, "~> 3.0"}
     ]

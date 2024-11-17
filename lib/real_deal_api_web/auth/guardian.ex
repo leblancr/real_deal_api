@@ -32,9 +32,11 @@ defmodule RealDealApiWeb.Auth.Guardian do
 
   # Accounts.get_account_by_email(email) returns an account
   def authenticate(email, password) do
+    IO.puts("authenticating email: #{email}, password: #{password}")
     case Accounts.get_account_by_email(email) do
       nil -> {:error, :unauthorized}
       account ->
+        IO.puts(inspect(account))
         case validate_password(password, account.hash_password) do
           true -> create_token(account) # returns {:ok, account, token}
           false -> {:error, :unauthorized}

@@ -57,6 +57,19 @@ defmodule RealDealApiWeb do
     end
   end
 
+  def view do
+    quote do
+      use Phoenix.View,
+          root: "lib/real_deal_api_web/templates",
+          namespace: RealDealApiWeb
+
+      import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
+      import RealDealApiWeb.ErrorHelpers
+      import RealDealApiWeb.Gettext
+      alias RealDealApiWeb.Router.Helpers, as: Routes
+    end
+  end
+
   @doc """
   When used, dispatch to the appropriate controller/live_view/etc.
   """

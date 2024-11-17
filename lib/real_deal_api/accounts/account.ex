@@ -40,18 +40,16 @@ defmodule RealDealApi.Accounts.Account do
   end
 
   @doc """
-  The function expects an input that matches the structure of an Ecto.Changeset struct.
-  This is specified by the pattern %Ecto.Changeset{...}.
+  The function expects an input that matches the structure of an Ecto.Changeset struct, this is specified by the pattern
+  %Ecto.Changeset{...} (the pattern goes on the left of =), changeset is the passed in input parameter.
   It will only proceed if the input is indeed an Ecto.Changeset.
   Inside the pattern, valid?: true checks that the valid? field of the changeset is true.
+  When the changeset is created, the valid? field is initially set to true by default.
   The changes: %{hash_password: hash_password} extracts the hash_password value from the changes map in the changeset.
   If hash_password exists in the changes, its value will be assigned to the local variable hash_password.
-  The = changeset part creates a new variable changeset that holds the entire Ecto.Changeset struct,
-  allowing you to use it later in the function body.
-  changeset is a new Ecto.Changeset struct.
   change() is from ecto, hash_password: is the key to change in changeset struct
   change the value of hash_password in changeset struct with the hashed one
-  return the result of change() which is a new (third?) changeset
+  return the result of change() which is a new changeset
   """
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{hash_password: hash_password}} = changeset) do
     change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password)) # change to the bcrypted password

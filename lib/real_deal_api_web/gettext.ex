@@ -20,5 +20,6 @@ defmodule RealDealApiWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :real_deal_api
+  # use Gettext, otp_app: :real_deal_api
+  use Gettext, backend: RealDealApiWeb.Gettext
 end

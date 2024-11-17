@@ -1,6 +1,7 @@
 defmodule RealDealApi.Accounts do
   @moduledoc """
   The Accounts context.
+  Functions to interact with the database.
   """
 
   import Ecto.Query, warn: false
@@ -36,20 +37,25 @@ defmodule RealDealApi.Accounts do
   end
 
   @doc """
-  Returns the list of accounts.
+  Gets a single account.
+
+  Raises `Ecto.NoResultsError` if the Account does not exist.
 
   ## Examples
 
-      iex> list_accounts()
-      [%Account{}, ...]
+      iex> get_account!(123)
+      %Account{}
+
+      iex> get_account!(456)
+      ** (Ecto.NoResultsError)
 
   """
-  def list_accounts do
-    Repo.all(Account)
-  end
+  def get_account!(id), do: Repo.get!(Account, id)
 
   @doc """
   Gets a single account by email.
+  To query by fields other than the primary key (e.g., by email),
+  you need to use the more general Ecto query methods like where
 
   returns nil if account doesn't exist.
 
@@ -68,24 +74,21 @@ defmodule RealDealApi.Accounts do
    end
 
   @doc """
-  Gets a single account.
 
-  Raises `Ecto.NoResultsError` if the Account does not exist.
+  """
+
+  @doc """
+  Returns the list of accounts.
 
   ## Examples
 
-      iex> get_account!(123)
-      %Account{}
-
-      iex> get_account!(456)
-      ** (Ecto.NoResultsError)
+      iex> list_accounts()
+      [%Account{}, ...]
 
   """
-  def get_account!(id), do: Repo.get!(Account, id)
-
-  @doc """
-
-  """
+  def list_accounts do
+    Repo.all(Account)
+  end
 
   @doc """
   Updates a account.

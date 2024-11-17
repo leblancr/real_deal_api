@@ -38,7 +38,7 @@ defmodule RealDealApi.Users do
   def get_user!(id), do: Repo.get!(User, id)
 
   @doc """
-  Creates a user.
+  Creates a user. what does that mean?
 
   ## Examples
 
@@ -48,16 +48,19 @@ defmodule RealDealApi.Users do
       iex> create_user(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
+      build_assoc/2 - takes two args
+      piped in thing becomes first arg of function
+      account |> Ecto.build_assoc(user) = equivalent to Ecto.build_assoc(account, user)
   """
   def create_user(account, attrs \\ %{}) do
     account
-    |> Ecto.build_assoc(user)
+    |> Ecto.build_assoc(:user)
     |> User.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a user.
+  Updates a user. what does that mean?
 
   ## Examples
 

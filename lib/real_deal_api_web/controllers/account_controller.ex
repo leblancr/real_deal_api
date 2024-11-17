@@ -1,4 +1,11 @@
 defmodule RealDealApiWeb.AccountController do
+  @moduledoc """
+  The AccountController handles requests related to user accounts.
+  Functions that endpoints can hit.
+  It provides actions for listing accounts, creating new accounts, and
+  managing account-related functionalities within the RealDeal API.
+  """
+
   use RealDealApiWeb, :controller
 
   alias RealDealApiWeb.Auth.Guardian
@@ -26,7 +33,7 @@ defmodule RealDealApiWeb.AccountController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/accounts/#{account}")
-      |> render(:show, account: account)
+      |> render("account_token_json", %{account: account, token: token})
     end
   end
 
