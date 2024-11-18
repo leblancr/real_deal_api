@@ -31,7 +31,7 @@ defmodule RealDealApi.Accounts.Account do
   """
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :hash_password])
+    |> cast(attrs, [:email, :hash_password]) # returns a changeset
     |> validate_required([:email, :hash_password])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "need @ and no spaces")
     |> validate_length(:email, max: 160)

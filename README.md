@@ -71,11 +71,29 @@ updated_at: ~U[2024-10-28 00:33:58Z]
 Database:
 real_deal_api_dev
 
-To create a new account, requires name and password:
-RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
+Flow:
+1. Create account:
+    RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
+    calls RealDealApi.Accounts.Account.changeset(attrs) attrs is %{email: "test1@proton.me", hash_password: "our_password"}
+    calls Ecto.Changeset.change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
+    then RealDealApi.Repo.insert()
 
-To authenticate and get a json web token:
-iex(12)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
+
+    Example: 
+    To create a new account, requires email and password:
+    iex(11)> RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
+
+2. Authenticate and get a json web token:
+    RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
+    calls RealDealApi.Accounts.get_account_by_email(email) returns an account struct,
+    representing an Account entity loaded from the accounts table in database as defined by 
+    the RealDealApi.Accounts.Account module schema: %RealDealApi.Accounts.Account{}  
+    then validate_password(password, account.hash_password)
+    then create_token(account) which returns {:ok, account, token}
+
+    Example:
+    To authenticate and get a jwt, requires email and password:
+    iex(12)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
 
 jwt:
 "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9
