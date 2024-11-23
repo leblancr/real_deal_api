@@ -17,6 +17,8 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
 
+
+RealDealApi Project tutorial:
 https://www.youtube.com/watch?v=LGY_eILc8Ks
 Using Phoenix Framework to Create an Elixir REST API Project
 
@@ -37,6 +39,9 @@ Start your Phoenix app with:
 You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
+
+Database:
+real_deal_api_dev
 
 Database setup:
 1. Create account table
@@ -67,12 +72,8 @@ inserted_at: ~U[2024-10-28 00:33:58Z],
 updated_at: ~U[2024-10-28 00:33:58Z]
 }}
 
-
-Database:
-real_deal_api_dev
-
 Flow:
-1. Create account:
+Step 1. Create account:
     RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
     calls RealDealApi.Accounts.Account.changeset(attrs) attrs is %{email: "test1@proton.me", hash_password: "our_password"}
     calls Ecto.Changeset.change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
@@ -83,13 +84,14 @@ Flow:
     To create a new account, requires email and password:
     iex(11)> RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
 
-2. Authenticate and get a json web token:
+Step 2. Authenticate with email and password and get a json web token:
     RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
     calls RealDealApi.Accounts.get_account_by_email(email) returns an account struct,
     representing an Account entity loaded from the accounts table in database as defined by 
     the RealDealApi.Accounts.Account module schema: %RealDealApi.Accounts.Account{}  
     then validate_password(password, account.hash_password)
     then create_token(account) which returns {:ok, account, token}
+
 
     Example:
     To authenticate and get a jwt, requires email and password:

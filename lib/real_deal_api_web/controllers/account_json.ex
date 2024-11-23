@@ -1,4 +1,7 @@
 defmodule RealDealApiWeb.AccountJSON do
+  @moduledoc """
+  account_view.ex is now account_json.ex
+  """
   alias RealDealApi.Accounts.Account
 
   @doc """

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JetClientState">
+    <option name="folders">
+      <list>
+        <folderState>
+          <option name="apis">
+            <list>
+              <integrationProperties>
+                <option name="name" value="real_deal_API" />
+              </integrationProperties>
+            </list>
+          </option>
+          <option name="environmentGroups">
+            <list>
+              <environmentGroupState>
+                <option name="environments">
+                  <list>
+                    <environmentState>
+                      <option name="name" value="Development" />
+                    </environmentState>
+                  </list>
+                </option>
+                <option name="name" value="Default" />
+              </environmentGroupState>
+            </list>
+          </option>
+          <option name="id" value="a9f444a2-9887-4421-96e4-d522b321c91b" />
+          <option name="name" value="New Project" />
+          <option name="preRequestScript" value="// Define the base URL for the API&#10;const BASE_URL = &quot;https://localhost:4000&quot;;&#10;&#10;// Export them so they can be used in requests&#10;return { BASE_URL };&#10;" />
+          <option name="selectedEnvironmentIds">
+            <map>
+              <entry key="default" />
+            </map>
+          </option>
+          <option name="syncProperties">
+            <synchronizationPropertiesState>
+              <option name="autoSync" value="true" />
+              <option name="folderPath" value="$PROJECT_DIR$/.jetclient" />
+            </synchronizationPropertiesState>
+          </option>
+        </folderState>
+      </list>
+    </option>
+    <option name="id" value="a5bc2f27-5a8c-47ea-9a49-5a54f6ac4102" />
+    <option name="version" value="4" />
+  </component>
+</project>

@@ -15,7 +15,7 @@ defmodule RealDealApiWeb.AccountController do
 
   def index(conn, _params) do
     accounts = Accounts.list_accounts()
-    render(conn, :index, accounts: accounts)
+    json(conn, accounts)
   end
 
   @doc """
@@ -33,20 +33,20 @@ defmodule RealDealApiWeb.AccountController do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/accounts/#{account}")
-      |> render("account_token_json", %{account: account, token: token})
+      |> json(%{account: account, token: token})
     end
   end
 
   def show(conn, %{"id" => id}) do
     account = Accounts.get_account!(id)
-    render(conn, :show, account: account)
+    json(conn, account)
   end
 
   def update(conn, %{"id" => id, "account" => account_params}) do
     account = Accounts.get_account!(id)
 
     with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
-      render(conn, :show, account: account)
+      json(conn, account)
     end
   end
 

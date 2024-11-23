@@ -2,6 +2,7 @@ defmodule RealDealApi.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :email, :inserted_at, :updated_at]}  # Add this line
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "accounts" do
