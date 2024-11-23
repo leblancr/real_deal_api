@@ -30,11 +30,11 @@ defmodule RealDealApi.Users do
   def create_user(account, attrs \\ %{}) do
     account
     |> Ecto.build_assoc(:user)  # Step 1: Build the associated User struct
-    |> IO.inspect(label: "After build_assoc")  # Debug step to inspect the new object
+    |> IO.inspect(label: "After build_assoc in #{__ENV__.file}")  # Debug step to inspect the new object
     |> User.changeset(attrs)     # Step 2: Apply changeset
-    |> IO.inspect(label: "After changeset")  # Debug step to inspect the object after changeset
+    |> IO.inspect(label: "After changeset in #{__ENV__.file}")  # Debug step to inspect the object after changeset
     |> Repo.insert()             # Step 3: Insert the new user into the database
-    |> IO.inspect(label: "After Repo.insert")  # Debug step to inspect the result of Repo.insert
+    |> IO.inspect(label: "After Repo.insert in #{__ENV__.file}")  # Debug step to inspect the result of Repo.insert
   end
 
   @doc """

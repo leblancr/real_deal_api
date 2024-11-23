@@ -13,18 +13,11 @@ defmodule RealDealApiWeb.AccountController do
 
   action_fallback RealDealApiWeb.FallbackController
 
-  def index(conn, _params) do
-    accounts = Accounts.list_accounts()
-    json(conn, accounts)
-  end
-
   @doc """
   {:ok, %Account{} = account} <- Accounts.create_account(account_params) means:
   Accounts.create_account() returns a {:ok, %Account{}}, then
   %Account{} struct that is returned is assigned to = account
   multiple functions can be called in with, executed in order
-
-
   """
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
@@ -37,6 +30,19 @@ defmodule RealDealApiWeb.AccountController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    account = Accounts.get_account!(id)
+
+    with {:ok, %Account{}} <- Accounts.delete_account(account) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  def index(conn, _params) do
+    accounts = Accounts.list_accounts()
+    json(conn, accounts)
+  end
+
   def show(conn, %{"id" => id}) do
     account = Accounts.get_account!(id)
     json(conn, account)
@@ -47,14 +53,6 @@ defmodule RealDealApiWeb.AccountController do
 
     with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
       json(conn, account)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
-
-    with {:ok, %Account{}} <- Accounts.delete_account(account) do
-      send_resp(conn, :no_content, "")
     end
   end
 end
