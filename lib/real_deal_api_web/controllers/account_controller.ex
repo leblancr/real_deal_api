@@ -8,14 +8,18 @@ defmodule RealDealApiWeb.AccountController do
 
   use RealDealApiWeb, :controller
 
-  alias RealDealApiWeb.Auth.Guardian
+  alias RealDealApiWeb.{Auth.Guardian, Auth.ErrorResponse}
   alias RealDealApi.{Accounts, Accounts.Account, Users, Users.User}
 
   action_fallback RealDealApiWeb.FallbackController
 
   @doc """
-  {:ok, %Account{} = account} <- Accounts.create_account(account_params) means:
-  Accounts.create_account() returns a {:ok, %Account{}}, then
+  Called when endpoint hit in router.ex:
+  When this endpoint hit, call this Module, :function.
+  `post "/accounts/create", AccountController, :create`
+
+  `{:ok, %Account{} = account}` <- Accounts.create_account(account_params) means:
+  `Accounts.create_account/1` returns a `{:ok, %Account{}}`, then
   %Account{} struct that is returned is assigned to = account
   multiple functions can be called in with, executed in order
   """
@@ -41,6 +45,21 @@ defmodule RealDealApiWeb.AccountController do
   def index(conn, _params) do
     accounts = Accounts.list_accounts()
     json(conn, accounts)
+  end
+
+  @doc """
+    Called when endpoint hit in router.ex:
+    When this endpoint hit, call this Module, :function.
+    `post "/accounts/sign_in", AccountController, :sign_in`
+  """
+  def sign_in(conn, %{"email" => email, "hash_password" => hash_password}) do
+    case Guardian.authenticate(email, hash_password) do
+      {:ok, account, token} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{account: account, token: token})
+      {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
+    end
   end
 
   def show(conn, %{"id" => id}) do

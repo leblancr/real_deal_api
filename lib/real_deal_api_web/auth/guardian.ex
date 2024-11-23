@@ -4,6 +4,22 @@ defmodule RealDealApiWeb.Auth.Guardian do
   alias RealDealApi.Accounts
 
   @doc """
+  Accounts.get_account_by_email(email) returns an account
+  """
+  def authenticate(email, password) do
+    IO.puts("authenticating email: #{email}, password: #{password}")
+    case Accounts.get_account_by_email(email) do
+      nil -> {:error, :unauthorized}
+      account ->
+        IO.puts("account: #{inspect(account)}") # account is a struct: %RealDealApi.Accounts.Account
+        case validate_password(password, account.hash_password) do
+          true -> create_token(account) # returns {:ok, account, token}
+          false -> {:error, :unauthorized}
+        end
+    end
+  end
+
+  @doc """
   %{id: id} means you're matching a map (not struct because no module prefix)
   that has a key :id, and you want to bind the value associated with that key to the variable id
   """
@@ -28,20 +44,6 @@ defmodule RealDealApiWeb.Auth.Guardian do
 
   def resource_from_claims(_claims) do
     {:error, :no_id_provided}
-  end
-
-  # Accounts.get_account_by_email(email) returns an account
-  def authenticate(email, password) do
-    IO.puts("authenticating email: #{email}, password: #{password}")
-    case Accounts.get_account_by_email(email) do
-      nil -> {:error, :unauthorized}
-      account ->
-        IO.puts("account: #{inspect(account)}") # account is a struct: %RealDealApi.Accounts.Account
-        case validate_password(password, account.hash_password) do
-          true -> create_token(account) # returns {:ok, account, token}
-          false -> {:error, :unauthorized}
-        end
-    end
   end
 
   defp validate_password(password, hash_password) do
