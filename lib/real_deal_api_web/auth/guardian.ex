@@ -1,13 +1,17 @@
 defmodule RealDealApiWeb.Auth.Guardian do
-  @moduledoc false
+  @moduledoc """
+  Implementation file for Guardian
+  """
   use Guardian, otp_app: :real_deal_api
   alias RealDealApi.Accounts
 
   @doc """
   Accounts.get_account_by_email(email) returns an account
+    Checks the passed in password against the one in the account:
+    validate_password(password, account.hash_password)
   """
   def authenticate(email, password) do
-    IO.puts("authenticating email: #{email}, password: #{password}")
+    IO.puts("guardian.ex authenticating email: #{email}, password: #{password}")
     case Accounts.get_account_by_email(email) do
       nil -> {:error, :unauthorized}
       account ->
@@ -17,6 +21,12 @@ defmodule RealDealApiWeb.Auth.Guardian do
           false -> {:error, :unauthorized}
         end
     end
+  end
+
+  # guardian encode and sign
+  defp create_token(account) do
+    {:ok, token, _claims} = encode_and_sign(account)
+    {:ok, account, token}
   end
 
   @doc """
@@ -47,13 +57,6 @@ defmodule RealDealApiWeb.Auth.Guardian do
   end
 
   defp validate_password(password, hash_password) do
-    Bcrypt.verify_pass(password, hash_password)
+    Bcrypt.verify_pass(password, hash_password) # returns true or false
   end
-
-  # guardian encode and sign
-  defp create_token(account) do
-    {:ok, token, _claims} = encode_and_sign(account)
-    {:ok, account, token}
-  end
-
 end

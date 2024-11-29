@@ -73,16 +73,46 @@ updated_at: ~U[2024-10-28 00:33:58Z]
 }}
 
 Flow:
+1. Create account in database:
+    router.ex says for this endpoint call AccountController.create()
+    post "/accounts/create", AccountController, :create
+
+    conn is automatically passed into the controller action by Phoenix.
+    The account struct comes from the body of the request.
+    AccountController.create(conn, %{"account" => account_params}) calls
+    Accounts.create_account(account_params) # creates account in database
+
+2. Authenticate (get a jwt, requires email and password):
+    AccountController.sign_in(conn, %{"email" => email, "hash_password" => hash_password})
+    calls Guardian.authenticate/2
+
+3. Protected Endpoints:
+
+
+
 Step 1. Create account:
-    RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
-    calls RealDealApi.Accounts.Account.changeset(attrs) attrs is %{email: "test1@proton.me", hash_password: "our_password"}
-    calls Ecto.Changeset.change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password))
-    then RealDealApi.Repo.insert()
+    RealDealApiWeb.AccountController.create(conn, %{"account" => account_params}) calls
+    RealDealApi.Accounts.create_account(attrs \\ %{}) attrs is %{email: "test1@proton.me", hash_password: "our_password"} calls
+    RealDealApi.Accounts.Account.changeset(attrs) attrs is %{email: "test1@proton.me", hash_password: "our_password"} calls
+    Ecto.Changeset.change(changeset, hash_password: Bcrypt.hash_pwd_salt(hash_password)) calls
+    RealDealApi.Repo.insert()
 
 
     Example: 
     To create a new account, requires email and password:
+    iex -S mix
     iex(11)> RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
+
+    by Hoppscotch- Uses AccountController.create/2:
+    Don't use https:
+    post http://localhost:4000/api/accounts/create
+    body, quote everything:
+    {
+        "account": {
+          "email": "client5@proton.me",
+          "hash_password": "our_password5"
+        }
+    }
 
 Step 2. Authenticate with email and password and get a json web token:
     RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
@@ -95,20 +125,37 @@ Step 2. Authenticate with email and password and get a json web token:
 
     Example:
     To authenticate and get a jwt, requires email and password:
+    iex -S mix
     iex(12)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
+    guardian.ex authenticating email: test1@proton.me, password: our_password
+    [debug] QUERY OK source="accounts" db=6.2ms decode=2.5ms queue=1.3ms idle=672.7ms
+    SELECT a0."id", a0."email", a0."hash_password", a0."inserted_at", a0."updated_at" FROM "accounts" AS a0 WHERE (a0."email" = $1) ["test1@proton.me"]
+    ↳ RealDealApiWeb.Auth.Guardian.authenticate/2, at: lib/real_deal_api_web/auth/guardian.ex:15
+    account: %RealDealApi.Accounts.Account{__meta__: #Ecto.Schema.Metadata<:loaded, "accounts">, id: "d671b809-0d36-4b75-8c1e-85f140ee0081", email: "test1@proton.me", hash_password: "$2b$12$M5KcYouCJZdhKKRs5tU6.edmfrn13cXn/WA.Bw.8xUSS8AfY43Cwu", user: #Ecto.Association.NotLoaded<association :user is not loaded>, inserted_at: ~U[2024-10-31 17:37:06Z], updated_at: ~U[2024-10-31 17:37:06Z]}
+    {:ok,
+    %RealDealApi.Accounts.Account{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "accounts">,
+    id: "d671b809-0d36-4b75-8c1e-85f140ee0081",
+    email: "test1@proton.me",
+    hash_password: "$2b$12$M5KcYouCJZdhKKRs5tU6.edmfrn13cXn/WA.Bw.8xUSS8AfY43Cwu",
+    user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+    inserted_at: ~U[2024-10-31 17:37:06Z],
+    updated_at: ~U[2024-10-31 17:37:06Z]
+    },
+    "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1MzIwNjcyLCJpYXQiOjE3MzI5MDE0NzIsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiIzOTdkYWQ5ZC0wZDVmLTQwZDAtODczYS04ZDQxYTJiODdjNTYiLCJuYmYiOjE3MzI5MDE0NzEsInN1YiI6ImQ2NzFiODA5LTBkMzYtNGI3NS04YzFlLTg1ZjE0MGVlMDA4MSIsInR5cCI6ImFjY2VzcyJ9.88Rw5fu5axIaXK4BpN6kbf1X824awWM_uubwRFhN8yvTwWr1nYLvqVx2fuiFRRv2cmRBhnswMRp_T3Noz2LEmQ"}
 
-jwt:
-"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9
-.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzMyODE1NjYwLCJpYXQiOjE3MzAzOTY0NjAsImlzcyI6InJlYWxfZGVhb
-F9hcGkiLCJqdGkiOiI3NWJkNjRhNy1kY2IwLTRjMmMtYTIxOC0xMjQ4NTAwMjBkZDEiLCJuYmYiOjE3MzAzOTY0NTksInN1YiI
-6ImQ2NzFiODA5LTBkMzYtNGI3NS04YzFlLTg1ZjE0MGVlMDA4MSIsInR5cCI6ImFjY2VzcyJ9
-.6hCVBtiiUtfOYnclP19yrgSKTY1fdoxZdJrmTMKflXGMcFbjVRBfZpOQHv3TdVH3wari6rG1JhvdLqcDnHLHmQ"
+    Test with bad password:
+    iex(13)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_passwod")
+    authenticating email: test1@proton.me, password: our_passwod
+    [debug] QUERY OK source="accounts" db=0.2ms idle=1063.7ms
+    SELECT a0."id", a0."email", a0."hash_password", a0."inserted_at", a0."updated_at" FROM "accounts" AS a0 WHERE (a0."email" = $1) ["test1@proton.me"]
+    ↳ RealDealApiWeb.Auth.Guardian.authenticate/2, at: lib/real_deal_api_web/auth/guardian.ex:36
+    %RealDealApi.Accounts.Account{__meta__: #Ecto.Schema.Metadata<:loaded, "accounts">, id: "d671b809-0d36-4b75-8c1e-85f140ee0081", email: "test1@proton.me", hash_password: "$2b$12$M5KcYouCJZdhKKRs5tU6.edmfrn13cXn/WA.Bw.8xUSS8AfY43Cwu", user: #Ecto.Association.NotLoaded<association :user is not loaded>, inserted_at: ~U[2024-10-31 17:37:06Z], updated_at: ~U[2024-10-31 17:37:06Z]}
+    {:error, :unauthorized}
 
-Test with bad password:
-iex(13)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_passwod")
-authenticating email: test1@proton.me, password: our_passwod
-[debug] QUERY OK source="accounts" db=0.2ms idle=1063.7ms
-SELECT a0."id", a0."email", a0."hash_password", a0."inserted_at", a0."updated_at" FROM "accounts" AS a0 WHERE (a0."email" = $1) ["test1@proton.me"]
-↳ RealDealApiWeb.Auth.Guardian.authenticate/2, at: lib/real_deal_api_web/auth/guardian.ex:36
-%RealDealApi.Accounts.Account{__meta__: #Ecto.Schema.Metadata<:loaded, "accounts">, id: "d671b809-0d36-4b75-8c1e-85f140ee0081", email: "test1@proton.me", hash_password: "$2b$12$M5KcYouCJZdhKKRs5tU6.edmfrn13cXn/WA.Bw.8xUSS8AfY43Cwu", user: #Ecto.Association.NotLoaded<association :user is not loaded>, inserted_at: ~U[2024-10-31 17:37:06Z], updated_at: ~U[2024-10-31 17:37:06Z]}
-{:error, :unauthorized}
+3. Protected Endpoints
+    Hoppscotch:
+    http://localhost:4000/api/
+
+
+4. "test1@proton.me", "our_password"

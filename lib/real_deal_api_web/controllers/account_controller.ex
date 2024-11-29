@@ -1,5 +1,6 @@
 defmodule RealDealApiWeb.AccountController do
   @moduledoc """
+  Controller action functions.
   The AccountController handles requests related to user accounts.
   Functions that endpoints can hit.
   It provides actions for listing accounts, creating new accounts, and
@@ -17,6 +18,9 @@ defmodule RealDealApiWeb.AccountController do
   Called when endpoint hit in router.ex:
   When this endpoint hit, call this Module, :function.
   `post "/accounts/create", AccountController, :create`
+
+  Takes conn and an account struct that gets called account_params
+    account_params = {email: "client5@proton.me", hash_password: "our_password5"}
 
   `{:ok, %Account{} = account}` <- Accounts.create_account(account_params) means:
   `Accounts.create_account/1` returns a `{:ok, %Account{}}`, then
@@ -47,6 +51,11 @@ defmodule RealDealApiWeb.AccountController do
     json(conn, accounts)
   end
 
+  def show(conn, %{"id" => id}) do
+    account = Accounts.get_account!(id)
+    json(conn, account)
+  end
+
   @doc """
     Called when endpoint hit in router.ex:
     When this endpoint hit, call this Module, :function.
@@ -56,15 +65,11 @@ defmodule RealDealApiWeb.AccountController do
     case Guardian.authenticate(email, hash_password) do
       {:ok, account, token} ->
         conn
+        IO.inspect(conn, label: "Conn")
         |> put_status(:ok)
         |> json(%{account: account, token: token})
       {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
     end
-  end
-
-  def show(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
-    json(conn, account)
   end
 
   def update(conn, %{"id" => id, "account" => account_params}) do
