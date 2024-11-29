@@ -51,15 +51,20 @@ defmodule RealDealApiWeb.AccountController do
     json(conn, accounts)
   end
 
+  @doc """
+    get "/accounts/by_id/:id", AccountController, :show
+
+    Get the id from the user account obtained from sign_in/authenticate
+  """
   def show(conn, %{"id" => id}) do
     account = Accounts.get_account!(id)
     json(conn, account)
   end
 
   @doc """
-    Called when endpoint hit in router.ex:
-    When this endpoint hit, call this Module, :function.
     `post "/accounts/sign_in", AccountController, :sign_in`
+
+      returns account and token in response
   """
   def sign_in(conn, %{"email" => email, "hash_password" => hash_password}) do
     case Guardian.authenticate(email, hash_password) do

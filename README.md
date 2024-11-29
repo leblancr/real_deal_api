@@ -83,10 +83,35 @@ Flow:
     Accounts.create_account(account_params) # creates account in database
 
 2. Authenticate (get a jwt, requires email and password):
-    AccountController.sign_in(conn, %{"email" => email, "hash_password" => hash_password})
-    calls Guardian.authenticate/2
+    Uses email and password to get a json web token.
+    Returns token in response body.
+     post "/accounts/sign_in", AccountController, :sign_in 
+
+    AccountController.sign_in(conn, %{"email" => email, "hash_password" => hash_password}) calls
+    Guardian.authenticate(email, password) calls
+    Accounts.get_account_by_email(email) returns {:ok, account, token}
 
 3. Protected Endpoints:
+   Use the id from account in step 2 to access sensitive material.
+    get "/accounts/by_id/:id", AccountController, :show
+
+   AccountController.show(conn, %{"id" => id}) calls
+   Accounts.get_account!(id)
+
+    returns:
+    {
+       "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1MzM2NzcxLCJpYXQiOjE3MzI5MTc1NzEsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJhZGFjNjllMS01ZTQzLTQ1OWQtODAwZi03MTg0ZDg2ZWZjZDgiLCJuYmYiOjE3MzI5MTc1NzAsInN1YiI6ImJlYjcxM2ZlLTQ5ODItNDIyMS1hMjRkLWIwNTdhYWY5MmJlNiIsInR5cCI6ImFjY2VzcyJ9.4n8WuOkLJVCfwluz3PX4QZ8aIVHrkcEpa2SjlkWvTnqxe90ySrCFm0XWblonc_kvGDXyUDqsM-modEL6T6m1Qg",
+       "account": {
+       "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+       "email": "client5@proton.me",
+       "inserted_at": "2024-11-29T18:32:14Z",
+       "updated_at": "2024-11-29T18:32:14Z"
+       }
+    }
+
+4. 
+
+    
 
 
 
@@ -103,7 +128,8 @@ Step 1. Create account:
     iex -S mix
     iex(11)> RealDealApi.Accounts.create_account(%{email: "test1@proton.me", hash_password: "our_password"})
 
-    by Hoppscotch- Uses AccountController.create/2:
+    Hoppscotch - Uses AccountController.create/2:
+    We provide the body, Hoppscotch adds conn.
     Don't use https:
     post http://localhost:4000/api/accounts/create
     body, quote everything:
@@ -126,7 +152,7 @@ Step 2. Authenticate with email and password and get a json web token:
     Example:
     To authenticate and get a jwt, requires email and password:
     iex -S mix
-    iex(12)> RealDealApiWeb.Auth.Guardian.authenticate("test1@proton.me", "our_password")
+    iex(12)> RealDealApiWeb.Auth.Guardian.authenticate("client5@proton.me", "our_password5")
     guardian.ex authenticating email: test1@proton.me, password: our_password
     [debug] QUERY OK source="accounts" db=6.2ms decode=2.5ms queue=1.3ms idle=672.7ms
     SELECT a0."id", a0."email", a0."hash_password", a0."inserted_at", a0."updated_at" FROM "accounts" AS a0 WHERE (a0."email" = $1) ["test1@proton.me"]
@@ -153,9 +179,52 @@ Step 2. Authenticate with email and password and get a json web token:
     %RealDealApi.Accounts.Account{__meta__: #Ecto.Schema.Metadata<:loaded, "accounts">, id: "d671b809-0d36-4b75-8c1e-85f140ee0081", email: "test1@proton.me", hash_password: "$2b$12$M5KcYouCJZdhKKRs5tU6.edmfrn13cXn/WA.Bw.8xUSS8AfY43Cwu", user: #Ecto.Association.NotLoaded<association :user is not loaded>, inserted_at: ~U[2024-10-31 17:37:06Z], updated_at: ~U[2024-10-31 17:37:06Z]}
     {:error, :unauthorized}
 
+    Hoppscotch - Uses AccountController.sign_in/2:
+    We provide the body, Hoppscotch adds conn.
+    Don't use https:
+    post http://localhost:4000/api/accounts/sign_in
+    body, quote everything:
+    {
+        "email": "client5@proton.me",
+        "hash_password": "our_password5"
+    }
+
+    "account": {
+        "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+        "email": "client5@proton.me",
+        "inserted_at": "2024-11-29T18:32:14Z",
+        "updated_at": "2024-11-29T18:32:14Z"
+    }
+
+    token:
+    eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1MzM0MTU5LCJpYXQiOjE3MzI5MTQ5NTksImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiIzMDk1NjY0ZC0xNDVlLTQ5NmItYWY1MS04N2FlYzUwNTkxMWYiLCJuYmYiOjE3MzI5MTQ5NTgsInN1YiI6ImJlYjcxM2ZlLTQ5ODItNDIyMS1hMjRkLWIwNTdhYWY5MmJlNiIsInR5cCI6ImFjY2VzcyJ9.ob75sbak67H7JgMC1i4ouAuNL6myHSh72e7FjjU90SIEoao-AHoOtr2S7-XDJ6kZWPs4qeXvs57UOlgVNPCYQw
+
 3. Protected Endpoints
+    Use the id from account to access protected endpoints.
+
+    "account": {
+       "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+       "email": "client5@proton.me",
+       "inserted_at": "2024-11-29T18:32:14Z",
+       "updated_at": "2024-11-29T18:32:14Z"
+    }
+
+
     Hoppscotch:
-    http://localhost:4000/api/
+    get http://localhost:4000/api/accounts/by_id/beb713fe-4982-4221-a24d-b057aaf92be6
+    No body
 
+    {
+        "error": "unauthenticated"
+    }
 
-4. "test1@proton.me", "our_password"
+    Need to add token to header or Authorization.
+    {
+    "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1MzM2NzcxLCJpYXQiOjE3MzI5MTc1NzEsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJhZGFjNjllMS01ZTQzLTQ1OWQtODAwZi03MTg0ZDg2ZWZjZDgiLCJuYmYiOjE3MzI5MTc1NzAsInN1YiI6ImJlYjcxM2ZlLTQ5ODItNDIyMS1hMjRkLWIwNTdhYWY5MmJlNiIsInR5cCI6ImFjY2VzcyJ9.4n8WuOkLJVCfwluz3PX4QZ8aIVHrkcEpa2SjlkWvTnqxe90ySrCFm0XWblonc_kvGDXyUDqsM-modEL6T6m1Qg",
+    "account": {
+        "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+        "email": "client5@proton.me",
+        "inserted_at": "2024-11-29T18:32:14Z",
+        "updated_at": "2024-11-29T18:32:14Z"
+        }
+    }

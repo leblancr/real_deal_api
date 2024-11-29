@@ -26,4 +26,9 @@ defmodule RealDealApiWeb.Auth.Pipeline do
     IO.inspect(conn, label: "Conn")  # Works because it's executed at runtime
     conn  # Don't forget to return the conn to continue the pipeline
   end
+
+  # If you need to raise Unauthorized explicitly
+  defp handle_unauthorized(conn) do
+    raise RealDealApiWeb.Auth.ErrorResponse.Unauthorized
+  end
 end

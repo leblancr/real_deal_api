@@ -9,6 +9,7 @@ defmodule RealDealApiWeb.Router do
     |> json(%{errors: "No route found"})
     |> halt()
   end
+
   defp handle_errors(conn, %{reason: %{message: message}}) do
     conn |> json(%{errors: message}) |> halt()
   end
