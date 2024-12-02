@@ -16,10 +16,12 @@ defmodule RealDealApiWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
   end
 
   pipeline :auth do
     plug RealDealApiWeb.Auth.Pipeline
+    plug RealDealApiWeb.Auth.SetAccount # get account thru assigns
   end
 
   # Endpoints: if you hit this endpoint call this Module, :function

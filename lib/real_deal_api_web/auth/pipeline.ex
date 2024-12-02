@@ -17,13 +17,13 @@ defmodule RealDealApiWeb.Auth.Pipeline do
   # Adding a custom plug to inspect conn during runtime
   plug :inspect_conn
 
-  plug Guardian.Plug.VerifySession
-  plug Guardian.Plug.VerifyHeader
+  plug Guardian.Plug.VerifySession #  checks for a session-based token
+  plug Guardian.Plug.VerifyHeader # checks for a token in the request header
   plug Guardian.Plug.EnsureAuthenticated # ensure token found in either of previous two
-  plug Guardian.Plug.LoadResource
+  plug Guardian.Plug.LoadResource # user
 
   defp inspect_conn(conn, _opts) do
-    IO.inspect(conn, label: "Conn")  # Works because it's executed at runtime
+    IO.inspect(conn, label: ":inspect_conn Conn")  # Works because it's executed at runtime
     conn  # Don't forget to return the conn to continue the pipeline
   end
 

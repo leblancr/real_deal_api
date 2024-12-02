@@ -57,8 +57,9 @@ defmodule RealDealApiWeb.AccountController do
     Get the id from the user account obtained from sign_in/authenticate
   """
   def show(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
-    json(conn, account)
+    # account = Accounts.get_account!(id)
+    IO.inspect(conn, label: "show Conn")  # Works because it's executed at runtime
+    json(conn, conn.assigns.account)
   end
 
   @doc """
@@ -70,10 +71,11 @@ defmodule RealDealApiWeb.AccountController do
     case Guardian.authenticate(email, hash_password) do
       {:ok, account, token} ->
         # Print the JWT (token)
-        IO.inspect(token, label: "JWT Token")
+        IO.inspect(token, label: "AccountController JWT Token")
 
         conn
-        IO.inspect(conn, label: "Conn")
+        IO.inspect(conn, label: "AccountController Conn")
+        |> Plug.Conn.put_session(:account_id, account.id)
         |> put_status(:ok)
         |> json(%{account: account, token: token})
       {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."

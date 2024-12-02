@@ -15,7 +15,7 @@ defmodule RealDealApiWeb.Auth.Guardian do
     case Accounts.get_account_by_email(email) do
       nil -> {:error, :unauthorized}
       account ->
-        IO.puts("account: #{inspect(account)}") # account is a struct: %RealDealApi.Accounts.Account
+        IO.puts("Guardian account: #{inspect(account)}") # account is a struct: %RealDealApi.Accounts.Account
         case validate_password(password, account.hash_password) do
           true -> create_token(account) # returns {:ok, account, token}
           false -> {:error, :unauthorized}

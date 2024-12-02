@@ -85,16 +85,16 @@ First two steps iex, rest endpoints.
 3. Register New Account Endpoint - Lesson 5
     Associates new account with user, generates jwt and id.
     post http://localhost:4000/api/accounts/create
-    {"email": "client5@proton.me", "hash_password": "our_password5"} 
-
+   {"account": {"email": "client6@proton.me", "hash_password": "our_password6"}
+   
 4. Sign In (Authenticate) Account Endpoint - Lesson 6
-    Returns generates jwt and id
+    Generates/returns jwt and id
     post http://localhost:4000/api/accounts/sign_in
-    {"account": {"email": "client5@proton.me", "hash_password": "our_password5"}}
+    {"email": "client5@proton.me", "hash_password": "our_password5"}
 
-5. Protected Endpoints - Lesson 7
+5. Protected Endpoints, get account by id - Lesson 7
     Get account using Guardian plugs that check for token.
-    Id in url not body. Need to add token to header or Authorization. 
+    Id in url not body. Need to add bearer token to header or Authorization. 
     get http://localhost:4000/api/accounts/by_id/beb713fe-4982-4221-a24d-b057aaf92be6
     {"email": "client5@proton.me", "hash_password": "our_password5"}
 
@@ -225,9 +225,9 @@ Step 4. Authenticate (iex) - sign in with email and password and get a jwt and i
         }
     }
 
-Step 5. Protected Endpoints
+Step 5. Protected Endpoints - Get account by id
     Use the id from account to access protected endpoints using endpoint not iex.
-    Id in url not body. Need to add token to header or Authorization. 
+    Id in url not body. Need to add bearer token to header or Authorization. 
     Just returns the account.
     AccountController.show(() calls
     Accounts.get_account!(id) calls
