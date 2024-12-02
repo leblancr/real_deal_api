@@ -29,7 +29,7 @@ defmodule RealDealApiWeb.AccountController do
   """
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(account),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(account), # generate a JWT
          {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
       conn
       |> put_status(:created)
@@ -69,6 +69,9 @@ defmodule RealDealApiWeb.AccountController do
   def sign_in(conn, %{"email" => email, "hash_password" => hash_password}) do
     case Guardian.authenticate(email, hash_password) do
       {:ok, account, token} ->
+        # Print the JWT (token)
+        IO.inspect(token, label: "JWT Token")
+
         conn
         IO.inspect(conn, label: "Conn")
         |> put_status(:ok)
