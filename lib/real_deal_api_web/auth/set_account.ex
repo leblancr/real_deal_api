@@ -1,6 +1,7 @@
 defmodule RealDealApiWeb.Auth.SetAccount do
   @moduledoc """
-
+  By storing the account in conn.assigns, you make it easily accessible to your controllers, views,
+  or any subsequent plugs without needing to manually fetch it again from the database or session.
   """
   import Plug.Conn
   alias RealDealApiWeb.Auth.ErrorResponse
@@ -11,7 +12,7 @@ defmodule RealDealApiWeb.Auth.SetAccount do
     []
   end
 
-  # take conn, return new one
+  # take conn, return new one with account added
   def call(conn, _options) do
     IO.inspect(conn, label: "SetAccount1 Conn")  # Works because it's executed at runtime
 

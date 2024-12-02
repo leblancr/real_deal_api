@@ -74,8 +74,9 @@ defmodule RealDealApiWeb.AccountController do
         IO.inspect(token, label: "AccountController JWT Token")
 
         conn
-        IO.inspect(conn, label: "AccountController Conn")
-        |> Plug.Conn.put_session(:account_id, account.id)
+        |> IO.inspect(label: "AccountController Conn1")
+        |> Plug.Conn.put_session(:account_id, account.id) #
+        |> IO.inspect(label: "AccountController Conn2")
         |> put_status(:ok)
         |> json(%{account: account, token: token})
       {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."

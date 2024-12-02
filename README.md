@@ -82,24 +82,25 @@ First two steps iex, rest endpoints.
     Bcrypts password in account.changeset/2
     iex(12)> Auth.Guardian.authenticate("client5@proton.me", "our_password5")
 
-3. Register New Account Endpoint - Lesson 5
+3. Register (create) New Account Endpoint - Lesson 5
     Associates new account with user, generates jwt and id.
     post http://localhost:4000/api/accounts/create
    {"account": {"email": "client6@proton.me", "hash_password": "our_password6"}
    
-4. Sign In (Authenticate) Account Endpoint - Lesson 6
+4. Sign In (authenticate) Account Endpoint - Lesson 6
     Generates/returns jwt and id
     post http://localhost:4000/api/accounts/sign_in
     {"email": "client5@proton.me", "hash_password": "our_password5"}
+    id: beb713fe-4982-4221-a24d-b057aaf92be6
 
 5. Protected Endpoints, get account by id - Lesson 7
     Get account using Guardian plugs that check for token.
     Id in url not body. Need to add bearer token to header or Authorization. 
-    get http://localhost:4000/api/accounts/by_id/beb713fe-4982-4221-a24d-b057aaf92be6
+    get http://localhost:4000/api/accounts/by_id/:id
     {"email": "client5@proton.me", "hash_password": "our_password5"}
 
 6. Account Session with Plug.Conn - Lesson 8
-    
+    Add account to conn.assigns in RealDealApiWeb.Auth.SetAccount plugin.
 
 
 Function calls:
@@ -271,7 +272,25 @@ Step 5. Protected Endpoints - Get account by id
     }
 
 Step 6. Account Session with Plug.Conn - Lesson 8
-    
+    Getting account from conn.assigns now.
+    def show(conn, %{"id" => id}) do
+        json(conn, conn.assigns.account)
+    end
+
+
+    %Plug.Conn{
+    adapter: {Bandit.Adapter, :...},
+    assigns: %{
+        account: %RealDealApi.Accounts.Account{
+            __meta__: #Ecto.Schema.Metadata<:loaded, "accounts">,
+            id: "beb713fe-4982-4221-a24d-b057aaf92be6",
+            email: "client5@proton.me",
+            hash_password: "$2b$12$/OSANj/tIFOLf9SjU8io7.EmwQc6nCYWqSGWUFASEzMF8hZEhbj9u",
+            user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+            inserted_at: ~U[2024-11-29 18:32:14Z],
+            updated_at: ~U[2024-11-29 18:32:14Z]
+        }
+    },
     
 
 Router endpoints:
