@@ -1,0 +1,78 @@
+[
+  {
+    "v": 5,
+    "name": "real",
+    "requests": [
+      {
+        "v": "9",
+        "name": "sign_in",
+        "method": "POST",
+        "endpoint": "http://localhost:4000/api/accounts/sign_in",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "bearer",
+          "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1NzkyNzEwLCJpYXQiOjE3MzMzNzM1MTAsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiI0NjJlMzYyOS1hZTc1LTQ2MzItOGUzZS0zYzg5YzM2ZTQ2MGEiLCJuYmYiOjE3MzMzNzM1MDksInN1YiI6IjQxNjMwNzQ0LTJlMzUtNDM4OC1iYWU4LWZkNzZiZmJmMDM2MiIsInR5cCI6ImFjY2VzcyJ9.LEHwoZVFinh-m2KWJn-oj43NsJI__9A2yPlRPk3xFYWgRyw5-eWs1BK5XnAFoJT-JNTvokAc1615BaWt8RLazg",
+          "authActive": true
+        },
+        "body": {
+          "contentType": "application/json",
+          "body": "   {\"email\": \"client6@proton.me\", \"hash_password\": \"our_password6\"}"
+        },
+        "requestVariables": [],
+        "responses": {}
+      },
+      {
+        "v": "9",
+        "name": "update",
+        "method": "POST",
+        "endpoint": "http://localhost:4000/api/accounts/update",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "bearer",
+          "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1Nzg4Nzk2LCJpYXQiOjE3MzMzNjk1OTYsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJmODVmODE4Zi0xOTVhLTQ1ZDYtYjYzNS0yN2ZiODNmZWRhNjIiLCJuYmYiOjE3MzMzNjk1OTUsInN1YiI6IjQxNjMwNzQ0LTJlMzUtNDM4OC1iYWU4LWZkNzZiZmJmMDM2MiIsInR5cCI6ImFjY2VzcyJ9.S39Douvz3aV8JEWzK117ICGt7DCTdQ09ycKU2yyqR15w22bEpiD9mM2cEmMOh-nCNvg94TjjglvU8Y3heG6xxg",
+          "authActive": true
+        },
+        "body": {
+          "contentType": "application/json",
+          "body": "   {\n     \"account\": {\n       \"id\": \"beb713fe-4982-4221-a24d-b057aaf92be6\",\n       \"hash_password\": \"our_password5\"\n     }\n   }\n"
+        },
+        "requestVariables": [],
+        "responses": {}
+      },
+      {
+        "v": "9",
+        "endpoint": "http://localhost:4000/api/accounts/by_id/41630744-2e35-4388-bae8-fd76bfbf0362",
+        "name": "by_id",
+        "params": [],
+        "headers": [],
+        "method": "GET",
+        "auth": {
+          "authType": "bearer",
+          "authActive": true,
+          "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1Nzk2MDgxLCJpYXQiOjE3MzMzNzY4ODEsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJmNjJkMTY3Yy1iMDc0LTQ0MGItYTVhYi01OTI4NGI0ODViNzUiLCJuYmYiOjE3MzMzNzY4ODAsInN1YiI6IjQxNjMwNzQ0LTJlMzUtNDM4OC1iYWU4LWZkNzZiZmJmMDM2MiIsInR5cCI6ImFjY2VzcyJ9.-Og8g-IdaLzywBAoXLQiHYFpqatQ_5TOF4qMMpTwnMtNf_3Bd2v9Jq9okbBsIWeggKUWLmloKj1TfKvpJdIW6A"
+        },
+        "preRequestScript": "",
+        "testScript": "",
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {}
+      }
+    ],
+    "auth": {
+      "authType": "none",
+      "authActive": true
+    },
+    "headers": [],
+    "_ref_id": "coll_m4ator77_6f656165-0e84-4a14-beb3-42855f38feb8",
+    "folders": []
+  }
+]

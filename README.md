@@ -73,7 +73,7 @@ updated_at: ~U[2024-10-28 00:33:58Z]
 }}
 
 
-Flow:
+Flow/Requests:
 First two steps iex, rest endpoints.
 1. Create Account, password not hashed - Lesson 3
     iex(2)> Accounts.create_account(%{email: "rkba1@proton.me", hash_password: "this is hashed"})
@@ -84,28 +84,90 @@ First two steps iex, rest endpoints.
 
 3. Register (create) New Account Endpoint - Lesson 5
     Associates new account with user, generates jwt and id.
+    Token and id are put in session (conn.private).
     post http://localhost:4000/api/accounts/create
-   {"account": {"email": "client6@proton.me", "hash_password": "our_password6"}
+    {"account": {"email": "client5@proton.me", "hash_password": "our_password5"}
    
 4. Sign In (authenticate) Account Endpoint - Lesson 6
     Generates/returns jwt and id
+    
     post http://localhost:4000/api/accounts/sign_in
-    {"email": "client5@proton.me", "hash_password": "our_password5"}
+    {"email": "client5@proton.me", "hash_password": "new_password5"}
+    
+    returns:
     id: beb713fe-4982-4221-a24d-b057aaf92be6
 
 5. Protected Endpoints, get account by id - Lesson 7
     Get account using Guardian plugs that check for token.
     Id in url not body. Need to add bearer token to header or Authorization. 
     get http://localhost:4000/api/accounts/by_id/:id
-    {"email": "client5@proton.me", "hash_password": "our_password5"}
+    no body.
+
+    Returns the account:
+    {
+      "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+      "email": "client5@proton.me",
+      "inserted_at": "2024-11-29T18:32:14Z",
+      "updated_at": "2024-11-29T18:32:14Z"
+    }
 
 6. Account Session with Plug.Conn - Lesson 8
     Add account to conn.assigns in RealDealApiWeb.Auth.SetAccount plugin.
+    Get account by id to test it, same url as lesson 7, no body.
+    get http://localhost:4000/api/accounts/by_id/beb713fe-4982-4221-a24d-b057aaf92be6
+    Put bearer token in Authorization:  
+    
+    assigns: %{
+      account: %RealDealApi.Accounts.Account{
+        __meta__: #Ecto.Schema.Metadata<:loaded, "accounts">,
+        id: "beb713fe-4982-4221-a24d-b057aaf92be6",
+        email: "client5@proton.me",
+        hash_password: "$2b$12$/OSANj/tIFOLf9SjU8io7.EmwQc6nCYWqSGWUFASEzMF8hZEhbj9u",
+        user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+        inserted_at: ~U[2024-11-29 18:32:14Z],
+        updated_at: ~U[2024-11-29 18:32:14Z]
+     }
+   }
 
+7. Using Plug Actions as "middleware" - Lesson 9
+    Authenticated user can only update their own account.
+    post http://localhost:4000/api/accounts/update
+   {
+     "account": {
+       "id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+       "hash_password": "our_password5"
+     }
+   }
+
+Accounts:
+client5@proton.me
+new_password5
+{
+"token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1NzkyNTg5LCJpYXQiOjE3MzMzNzMzODksImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiI5ZTBhMGE4YS0xZTM5LTQwYjctYmEzNC03MzhkMzI1NDQxMGEiLCJuYmYiOjE3MzMzNzMzODgsInN1YiI6ImJlYjcxM2ZlLTQ5ODItNDIyMS1hMjRkLWIwNTdhYWY5MmJlNiIsInR5cCI6ImFjY2VzcyJ9.J7NmCIvyCNg6Ggt5DA7dTBd_gSwqe1US94-fYNS1uaEhjoJMVvxiosUmI0yTwdIkF7ve0GCevIFkP6J1QCUzrQ",
+"account": {
+"id": "beb713fe-4982-4221-a24d-b057aaf92be6",
+"email": "client5@proton.me",
+"inserted_at": "2024-11-29T18:32:14Z",
+"updated_at": "2024-12-04T01:42:59Z"
+}
+}
+
+{
+
+client6@proton.me
+our_password6
+{
+"token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1Nzk2MDgxLCJpYXQiOjE3MzMzNzY4ODEsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJmNjJkMTY3Yy1iMDc0LTQ0MGItYTVhYi01OTI4NGI0ODViNzUiLCJuYmYiOjE3MzMzNzY4ODAsInN1YiI6IjQxNjMwNzQ0LTJlMzUtNDM4OC1iYWU4LWZkNzZiZmJmMDM2MiIsInR5cCI6ImFjY2VzcyJ9.-Og8g-IdaLzywBAoXLQiHYFpqatQ_5TOF4qMMpTwnMtNf_3Bd2v9Jq9okbBsIWeggKUWLmloKj1TfKvpJdIW6A",
+"account": {
+"id": "41630744-2e35-4388-bae8-fd76bfbf0362",
+"email": "client6@proton.me",
+"inserted_at": "2024-12-02T05:03:14Z",
+"updated_at": "2024-12-02T05:03:14Z"
+}
+}
 
 Function calls:
 First two steps iex, rest endpoints.
-
 Step 1. Create account (iex):
     AccountController.create(conn, %{"account" => account_params}) calls
     Accounts.create_account(attrs \\ %{}) attrs is %{email: "test1@proton.me", hash_password: "our_password"} calls
@@ -194,7 +256,7 @@ Step 3. Register New Account Endpoint - Create account and user, generate a JWT
         }
     }
 
-Step 4. Authenticate (iex) - sign in with email and password and get a jwt and id.
+Step 4. Authenticate (iex) - sign in with email and password and get a jwt and id (put in session).
     AccountController.sign_in(() calls
     Auth.Guardian.authenticate("test1@proton.me", "our_password") calls
     Accounts.get_account_by_email(email) returns an account struct,
@@ -243,7 +305,7 @@ Step 5. Protected Endpoints - Get account by id
         "error": "unauthenticated"
     }
 
-    Need to add token to header or Authorization.
+    Need to add bearer token to header or Authorization.
     {
     "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZWFsX2RlYWxfYXBpIiwiZXhwIjoxNzM1MzM2NzcxLCJpYXQiOjE3MzI5MTc1NzEsImlzcyI6InJlYWxfZGVhbF9hcGkiLCJqdGkiOiJhZGFjNjllMS01ZTQzLTQ1OWQtODAwZi03MTg0ZDg2ZWZjZDgiLCJuYmYiOjE3MzI5MTc1NzAsInN1YiI6ImJlYjcxM2ZlLTQ5ODItNDIyMS1hMjRkLWIwNTdhYWY5MmJlNiIsInR5cCI6ImFjY2VzcyJ9.4n8WuOkLJVCfwluz3PX4QZ8aIVHrkcEpa2SjlkWvTnqxe90ySrCFm0XWblonc_kvGDXyUDqsM-modEL6T6m1Qg",
     "account": {
@@ -272,7 +334,7 @@ Step 5. Protected Endpoints - Get account by id
     }
 
 Step 6. Account Session with Plug.Conn - Lesson 8
-    Getting account from conn.assigns now.
+    Can get account from conn.assigns now, just demo, then put code back to from db.
     def show(conn, %{"id" => id}) do
         json(conn, conn.assigns.account)
     end
@@ -291,7 +353,14 @@ Step 6. Account Session with Plug.Conn - Lesson 8
             updated_at: ~U[2024-11-29 18:32:14Z]
         }
     },
-    
+
+Step 7. Using Plug Actions as "middleware" - Lesson 9
+    Authenticated user can only update their own account.
+    post "/accounts/update", AccountController, :update
+
+    account = Accounts.get_account!(account_params["id"])
+    Accounts.update_account(account, account_params)
+
 
 Router endpoints:
 Create account in database:

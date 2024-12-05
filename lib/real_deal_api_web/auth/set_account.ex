@@ -35,9 +35,8 @@ defmodule RealDealApiWeb.Auth.SetAccount do
         raise ErrorResponse.Unauthorized
       end
 
-      # Assign the account to the conn
       IO.inspect(conn, label: "SetAccount2 Conn")  # Log after account is fetched
-
+      # Assign the account to the conn
       conn
       |> assign(:account, account)
       |> IO.inspect(label: "SetAccount3 Conn")  # Log after assignment    end

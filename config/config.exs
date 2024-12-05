@@ -25,7 +25,8 @@ config :real_deal_api, RealDealApiWeb.Endpoint,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  metadata: [:request_id],
+  level: :debug
 
 config :real_deal_api, RealDealApiWeb.Auth.Guardian,
   issuer: "real_deal_api",

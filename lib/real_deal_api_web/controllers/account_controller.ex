@@ -6,11 +6,13 @@ defmodule RealDealApiWeb.AccountController do
   It provides actions for listing accounts, creating new accounts, and
   managing account-related functionalities within the RealDeal API.
   """
-
+  require Logger
   use RealDealApiWeb, :controller
 
   alias RealDealApiWeb.{Auth.Guardian, Auth.ErrorResponse}
   alias RealDealApi.{Accounts, Accounts.Account, Users, Users.User}
+
+  plug :is_authorized_account when action in [:update, :delete]
 
   action_fallback RealDealApiWeb.FallbackController
 
@@ -52,14 +54,32 @@ defmodule RealDealApiWeb.AccountController do
   end
 
   @doc """
+  Get id from conn params, get account for that id from database
+    Compare the id from conn.assigns.account.id (signed in id) to the one in database
+  """
+  defp is_authorized_account(conn, _opts) do
+    %{params: %{"account" => params}} = conn
+    account = Accounts.get_account!(params["id"]) # get account from database for that id
+    if conn.assigns.account.id == account.id do
+      conn
+    else
+      raise ErrorResponse.Forbidden
+    end
+  end
+
+  @doc """
     get "/accounts/by_id/:id", AccountController, :show
 
     Get the id from the user account obtained from sign_in/authenticate
   """
   def show(conn, %{"id" => id}) do
-    # account = Accounts.get_account!(id)
+    # Log the Authorization header (Bearer token)
+    token = get_req_header(conn, "authorization") |> List.first()
+    Logger.debug("Authorization header: #{inspect(token)}")
+
+    account = Accounts.get_account!(id)
     IO.inspect(conn, label: "show Conn")  # Works because it's executed at runtime
-    json(conn, conn.assigns.account)
+    json(conn, account)
   end
 
   @doc """
@@ -75,7 +95,7 @@ defmodule RealDealApiWeb.AccountController do
 
         conn
         |> IO.inspect(label: "AccountController Conn1")
-        |> Plug.Conn.put_session(:account_id, account.id) #
+        |> Plug.Conn.put_session(:account_id, account.id) # we made
         |> IO.inspect(label: "AccountController Conn2")
         |> put_status(:ok)
         |> json(%{account: account, token: token})
@@ -83,8 +103,14 @@ defmodule RealDealApiWeb.AccountController do
     end
   end
 
-  def update(conn, %{"id" => id, "account" => account_params}) do
-    account = Accounts.get_account!(id)
+  @doc """
+  post "/accounts/update", AccountController, :update`
+
+  Get account from database by id. Update account with new account params.
+  Write account back to database with new info.
+  """
+  def update(conn, %{"account" => account_params}) do
+    account = Accounts.get_account!(account_params["id"])
 
     with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
       json(conn, account)
