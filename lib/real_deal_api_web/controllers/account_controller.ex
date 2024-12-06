@@ -16,6 +16,22 @@ defmodule RealDealApiWeb.AccountController do
 
   action_fallback RealDealApiWeb.FallbackController
 
+  defp authorize_account(conn, email, hash_password) do
+    case Guardian.authenticate(email, hash_password) do
+      {:ok, account, token} ->
+        # Print the JWT (token)
+        IO.inspect(token, label: "AccountController JWT Token")
+
+        conn
+        |> IO.inspect(label: "AccountController Conn1")
+        |> Plug.Conn.put_session(:account_id, account.id) # we made
+        |> IO.inspect(label: "AccountController Conn2")
+        |> put_status(:ok)
+        |> json(%{account: account, token: token})
+      {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
+    end
+  end
+
   @doc """
   Called when endpoint hit in router.ex:
   When this endpoint hit, call this Module, :function.
@@ -28,15 +44,13 @@ defmodule RealDealApiWeb.AccountController do
   `Accounts.create_account/1` returns a `{:ok, %Account{}}`, then
   %Account{} struct that is returned is assigned to = account
   multiple functions can be called in with, executed in order
+
+  authorize with passed in password not from created account which is hashed.
   """
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(account), # generate a JWT
          {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/accounts/#{account}")
-      |> json(%{account: account, token: token})
+      authorize_account(conn, account.email, account_params["hash_password"])
     end
   end
 
@@ -68,28 +82,15 @@ defmodule RealDealApiWeb.AccountController do
   end
 
   @doc """
-  old_token = Guardian.Plug.current_token(conn)
-  {:ok, claims} -> Guardian.decode_and_verify(old_token)
-  {:ok, account} -> Guardian.resource_from_claims(claims)
-  {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
+  Gets a new token.
   """
   def refresh_session(conn, %{}) do
-    old_token = Guardian.Plug.current_token(conn)
-    case Guardian.decode_and_verify(old_token) do
-      {:ok, claims} ->
-        case Guardian.resource_from_claims(claims) do
-          {:ok, account} ->
-          {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
-            conn
-            |> Plug.Conn.put_session(:account_id, account.id)
-            |> put_status(:ok)
-            |> json(%{account: account, token: new_token})
-          {:error, _reason} -> raise ErrorResponse.NotFound
-        end
-
-      {:error, _reason} ->
-        raise ErrorResponse.NotFound
-    end
+    token = Guardian.Plug.current_token(conn)
+    {:ok, account, new_token} = Guardian.authenticate(token)
+    conn
+    |> Plug.Conn.put_session(:account_id, account.id)
+    |> put_status(:ok)
+    |> json(%{account: account, token: new_token})
   end
 
   @doc """
@@ -113,19 +114,7 @@ defmodule RealDealApiWeb.AccountController do
       returns account and token in response
   """
   def sign_in(conn, %{"email" => email, "hash_password" => hash_password}) do
-    case Guardian.authenticate(email, hash_password) do
-      {:ok, account, token} ->
-        # Print the JWT (token)
-        IO.inspect(token, label: "AccountController JWT Token")
-
-        conn
-        |> IO.inspect(label: "AccountController Conn1")
-        |> Plug.Conn.put_session(:account_id, account.id) # we made
-        |> IO.inspect(label: "AccountController Conn2")
-        |> put_status(:ok)
-        |> json(%{account: account, token: token})
-      {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
-    end
+    authorize_account(conn, email, hash_password)
   end
 
   def sign_out(conn, %{}) do
