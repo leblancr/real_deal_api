@@ -139,6 +139,32 @@ First two steps iex, rest endpoints.
      }
    }
 
+8. Using Guardian.DB to track or revoke JWTs - Lesson 10
+   mix guardian.db.gen.migration
+   mix ecto.migrate
+   create table guardian_tokens
+   post http://localhost:4000/api/accounts/sign_out
+   {
+     "token": null,
+     "account": {
+       "id": "41630744-2e35-4388-bae8-fd76bfbf0362",
+       "email": "client6@proton.me",
+       "inserted_at": "2024-12-02T05:03:14Z",
+       "updated_at": "2024-12-05T05:47:27Z"
+     }
+   }    
+
+9. Using Guardian to refresh a JWT session - Lesson 11
+   1. Sign in to get new token. Copy it and use in get by_id.
+   2. Get account by id.
+   3. Refresh session using original bearer token in Authorization and get new token.
+   4. Try get account by id with old token. "error": "invalid_token"
+   5. Try get account by id again with new token. works
+ 
+10. Set Token types & Expiration with Guardian - Lesson 12
+    
+
+
 Accounts:
 client5@proton.me
 new_password5
@@ -361,6 +387,33 @@ Step 7. Using Plug Actions as "middleware" - Lesson 9
     account = Accounts.get_account!(account_params["id"])
     Accounts.update_account(account, account_params)
 
+Step 8. Using Guardian.DB to track or revoke JWTs  - Lesson 10
+Removes token from Guardian database
+    account = conn.assigns[:account]
+    token = Guardian.Plug.current_token(conn)
+    Guardian.revoke(token)
+
+    returns:
+    {
+        "token": null,
+        "account": {
+            "id": "41630744-2e35-4388-bae8-fd76bfbf0362",
+            "email": "client6@proton.me",
+            "inserted_at": "2024-12-02T05:03:14Z",
+            "updated_at": "2024-12-05T05:47:27Z"
+        }
+    }
+
+Step 9. Using Guardian to refresh a JWT session - Lesson 11
+    Replaces old token with a new one.
+
+    old_token = Guardian.Plug.current_token(conn)
+    {:ok, claims} -> Guardian.decode_and_verify(old_token)
+    {:ok, account} -> Guardian.resource_from_claims(claims)
+    {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
+
+Step 10. Set Token types & Expiration with Guardian
+    
 
 Router endpoints:
 Create account in database:

@@ -68,6 +68,31 @@ defmodule RealDealApiWeb.AccountController do
   end
 
   @doc """
+  old_token = Guardian.Plug.current_token(conn)
+  {:ok, claims} -> Guardian.decode_and_verify(old_token)
+  {:ok, account} -> Guardian.resource_from_claims(claims)
+  {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
+  """
+  def refresh_session(conn, %{}) do
+    old_token = Guardian.Plug.current_token(conn)
+    case Guardian.decode_and_verify(old_token) do
+      {:ok, claims} ->
+        case Guardian.resource_from_claims(claims) do
+          {:ok, account} ->
+          {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
+            conn
+            |> Plug.Conn.put_session(:account_id, account.id)
+            |> put_status(:ok)
+            |> json(%{account: account, token: new_token})
+          {:error, _reason} -> raise ErrorResponse.NotFound
+        end
+
+      {:error, _reason} ->
+        raise ErrorResponse.NotFound
+    end
+  end
+
+  @doc """
     get "/accounts/by_id/:id", AccountController, :show
 
     Get the id from the user account obtained from sign_in/authenticate
@@ -101,6 +126,17 @@ defmodule RealDealApiWeb.AccountController do
         |> json(%{account: account, token: token})
       {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
     end
+  end
+
+  def sign_out(conn, %{}) do
+    account = conn.assigns[:account]
+    token = Guardian.Plug.current_token(conn)
+    Guardian.revoke(token)
+    token = nil
+    conn
+    |> Plug.Conn.clear_session()
+    |> put_status(:ok)
+    |> json(%{account: account, token: token})
   end
 
   @doc """
