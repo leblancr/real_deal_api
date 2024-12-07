@@ -14,7 +14,7 @@ defmodule RealDealApiWeb.Auth.SetAccount do
 
   # take conn, return new one with account added
   def call(conn, _options) do
-    IO.inspect(conn, label: "SetAccount1 Conn")  # Works because it's executed at runtime
+    # IO.inspect(conn, label: "SetAccount1 Conn")  # Works because it's executed at runtime
 
     if conn.assigns[:account] do
       # If the account is already assigned, we just return the conn
@@ -35,11 +35,11 @@ defmodule RealDealApiWeb.Auth.SetAccount do
         raise ErrorResponse.Unauthorized
       end
 
-      IO.inspect(conn, label: "SetAccount2 Conn")  # Log after account is fetched
+      # IO.inspect(conn, label: "SetAccount2 Conn")  # Log after account is fetched
       # Assign the account to the conn
       conn
       |> assign(:account, account)
-      |> IO.inspect(label: "SetAccount3 Conn")  # Log after assignment    end
+      # |> IO.inspect(label: "SetAccount3 Conn")  # Log after assignment    end
     end
   end
 end

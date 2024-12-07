@@ -5,32 +5,18 @@ defmodule RealDealApiWeb.AccountController do
   Functions that endpoints can hit.
   It provides actions for listing accounts, creating new accounts, and
   managing account-related functionalities within the RealDeal API.
+
+  _view.ex files are now _json.ex files where data in formatted, jsonified.
   """
   require Logger
   use RealDealApiWeb, :controller
 
-  alias RealDealApiWeb.{Auth.Guardian, Auth.ErrorResponse}
+  alias RealDealApiWeb.{Auth.Guardian, Auth.ErrorResponse, AccountJSON}
   alias RealDealApi.{Accounts, Accounts.Account, Users, Users.User}
 
   plug :is_authorized_account when action in [:update, :delete]
 
   action_fallback RealDealApiWeb.FallbackController
-
-  defp authorize_account(conn, email, hash_password) do
-    case Guardian.authenticate(email, hash_password) do
-      {:ok, account, token} ->
-        # Print the JWT (token)
-        IO.inspect(token, label: "AccountController JWT Token")
-
-        conn
-        |> IO.inspect(label: "AccountController Conn1")
-        |> Plug.Conn.put_session(:account_id, account.id) # we made
-        |> IO.inspect(label: "AccountController Conn2")
-        |> put_status(:ok)
-        |> json(%{account: account, token: token})
-      {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
-    end
-  end
 
   @doc """
   Called when endpoint hit in router.ex:
@@ -64,21 +50,7 @@ defmodule RealDealApiWeb.AccountController do
 
   def index(conn, _params) do
     accounts = Accounts.list_accounts()
-    json(conn, accounts)
-  end
-
-  @doc """
-  Get id from conn params, get account for that id from database
-    Compare the id from conn.assigns.account.id (signed in id) to the one in database
-  """
-  defp is_authorized_account(conn, _opts) do
-    %{params: %{"account" => params}} = conn
-    account = Accounts.get_account!(params["id"]) # get account from database for that id
-    if conn.assigns.account.id == account.id do
-      conn
-    else
-      raise ErrorResponse.Forbidden
-    end
+    json(conn, accounts) # Calls AccountJSON.index/1 internally
   end
 
   @doc """
@@ -103,9 +75,14 @@ defmodule RealDealApiWeb.AccountController do
     token = get_req_header(conn, "authorization") |> List.first()
     Logger.debug("Authorization header: #{inspect(token)}")
 
-    account = Accounts.get_account!(id)
-    IO.inspect(conn, label: "show Conn")  # Works because it's executed at runtime
-    json(conn, account)
+    account = Accounts.get_full_account(id)
+    # IO.inspect(account.user, label: "Loaded User:")
+    # IO.inspect(account, label: "Loaded Account:")
+
+    # Check if the user association is loaded
+    # IO.inspect(account.user, label: "User Loaded?")
+    # IO.inspect(conn, label: "show Conn")  # Works because it's executed at runtime
+    json(conn, AccountJSON.show(%{account: account})) # Calls AccountJSON.show/1 internally
   end
 
   @doc """
@@ -139,6 +116,36 @@ defmodule RealDealApiWeb.AccountController do
 
     with {:ok, %Account{} = account} <- Accounts.update_account(account, account_params) do
       json(conn, account)
+    end
+  end
+
+  defp authorize_account(conn, email, hash_password) do
+    case Guardian.authenticate(email, hash_password) do
+      {:ok, account, token} ->
+        # Print the JWT (token)
+        IO.inspect(token, label: "AccountController JWT Token")
+
+        conn
+        |> IO.inspect(label: "AccountController Conn1")
+        |> Plug.Conn.put_session(:account_id, account.id) # we made
+        |> IO.inspect(label: "AccountController Conn2")
+        |> put_status(:ok)
+        |> json(%{account: account, token: token}) # uses account_json.ex
+      {:error, :unauthorized} -> raise ErrorResponse.Unauthorized, message: "Email or Password incorrect."
+    end
+  end
+
+  @doc """
+  Get id from conn params, get account for that id from database
+    Compare the id from conn.assigns.account.id (signed in id) to the one in database
+  """
+  defp is_authorized_account(conn, _opts) do
+    %{params: %{"account" => params}} = conn
+    account = Accounts.get_account!(params["id"]) # get account from database for that id
+    if conn.assigns.account.id == account.id do
+      conn
+    else
+      raise ErrorResponse.Forbidden
     end
   end
 end

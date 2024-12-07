@@ -23,7 +23,7 @@ defmodule RealDealApiWeb.Auth.Pipeline do
   plug Guardian.Plug.LoadResource # user
 
   defp inspect_conn(conn, _opts) do
-    IO.inspect(conn, label: ":inspect_conn Conn")  # Works because it's executed at runtime
+    # IO.inspect(conn, label: ":inspect_conn Conn")  # Works because it's executed at runtime
     conn  # Don't forget to return the conn to continue the pipeline
   end
 

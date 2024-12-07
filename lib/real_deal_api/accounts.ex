@@ -78,6 +78,16 @@ defmodule RealDealApi.Accounts do
   @doc """
 
   """
+  def get_full_account(id) do
+    account =
+      Account
+      |> where(id: ^id)
+      |> preload(:user)
+      |> Repo.one()
+
+    # IO.inspect(account, label: "Loaded Account")
+    account
+  end
 
   @doc """
   Returns the list of accounts.

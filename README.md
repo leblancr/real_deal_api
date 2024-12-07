@@ -40,6 +40,9 @@ You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
 
+_view.ex files are now _json.ex files.
+ex: account_view.ex is now account_json.ex
+
 Database:
 real_deal_api_dev
 
